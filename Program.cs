@@ -23,7 +23,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// ... seu código para os endpoints (app.MapGet, app.MapPost, etc.)
-// A partir daqui, você pode injetar o LibraryDbContext em seus endpoints para acessar o banco de dados.
 
 app.Run();

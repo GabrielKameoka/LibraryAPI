@@ -1,15 +1,33 @@
 ﻿namespace LibraryAPI.Models.Entities;
 
-public class Emprestimo
+public class Emprestimos
 {
     public int Id { get; set; }
-
-    public int IdLivro { get; set; }
-    public int IdUsuario { get; set; }
-
-    public DateOnly DataEmprestimo { get; set; } // Data em que o livro foi emprestado
-    public DateOnly DataDevolucaoPrevista { get; set; }
-    public DateOnly? DataDevolucaoRealizada { get; set; } // Data real da devolução (pode ser nula se ainda não foi devolvido)
-
-    public bool EstaDevolvido => DataDevolucaoRealizada.HasValue; // Propriedade de leitura para verificar o status
+    
+    // Chaves estrangeiras
+    public int LivroId { get; set; }
+    public int UsuarioId { get; set; }
+    
+    public DateTime DataEmprestimo { get; set; } = DateTime.UtcNow;
+    public DateTime DataDevolucaoPrevista { get; set; }
+    public DateTime? DataDevolucaoRealizada { get; set; }
+    
+    // Propriedade calculada
+    public bool EstaAtrasado => 
+        !EstaDevolvido && DateTime.UtcNow > DataDevolucaoPrevista;
+    
+    public bool EstaDevolvido => DataDevolucaoRealizada.HasValue;
+    
+    // Multa por atraso (exemplo)
+    public decimal CalcularMulta()
+    {
+        if (!EstaAtrasado) return 0;
+        
+        var diasAtraso = (DateTime.UtcNow - DataDevolucaoPrevista).Days;
+        return diasAtraso * 2.50m; // R$ 2,50 por dia de atraso
+    }
+    
+    // Navegações
+    public virtual Livros Livro { get; set; } = null!;
+    public virtual Usuarios Usuario { get; set; } = null!;
 }

@@ -4,6 +4,7 @@ using LibraryAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryAPI.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    partial class LibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250821155213_AddListAutor")]
+    partial class AddListAutor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,15 +35,14 @@ namespace LibraryAPI.Migrations
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Autores");
                 });
 
-            modelBuilder.Entity("LibraryAPI.Models.Entities.Emprestimos", b =>
+            modelBuilder.Entity("LibraryAPI.Models.Entities.Emprestimo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,28 +50,22 @@ namespace LibraryAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("DataDevolucaoPrevista")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DataDevolucaoPrevista")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime?>("DataDevolucaoRealizada")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("DataDevolucaoRealizada")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime>("DataEmprestimo")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DataEmprestimo")
+                        .HasColumnType("date");
 
-                    b.Property<int>("LivroId")
+                    b.Property<int>("IdLivro")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsuarioId")
+                    b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DataDevolucaoRealizada");
-
-                    b.HasIndex("LivroId");
-
-                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Emprestimos");
                 });
@@ -85,19 +81,16 @@ namespace LibraryAPI.Migrations
                     b.Property<int>("AutorId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("DataLancamento")
+                    b.Property<DateOnly>("Lancamento")
                         .HasColumnType("date");
 
-                    b.Property<string>("Titulo")
+                    b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AutorId");
-
-                    b.HasIndex("Titulo");
 
                     b.ToTable("Livros");
                 });
@@ -112,65 +105,26 @@ namespace LibraryAPI.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.ToTable("Usuarios");
-                });
-
-            modelBuilder.Entity("LibraryAPI.Models.Entities.Emprestimos", b =>
-                {
-                    b.HasOne("LibraryAPI.Models.Entities.Livros", "Livro")
-                        .WithMany("Emprestimos")
-                        .HasForeignKey("LivroId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("LibraryAPI.Models.Entities.Usuarios", "Usuario")
-                        .WithMany("Emprestimos")
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Livro");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("LibraryAPI.Models.Entities.Livros", b =>
                 {
                     b.HasOne("LibraryAPI.Models.Entities.Autores", "Autor")
-                        .WithMany("Livros")
+                        .WithMany()
                         .HasForeignKey("AutorId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Autor");
-                });
-
-            modelBuilder.Entity("LibraryAPI.Models.Entities.Autores", b =>
-                {
-                    b.Navigation("Livros");
-                });
-
-            modelBuilder.Entity("LibraryAPI.Models.Entities.Livros", b =>
-                {
-                    b.Navigation("Emprestimos");
-                });
-
-            modelBuilder.Entity("LibraryAPI.Models.Entities.Usuarios", b =>
-                {
-                    b.Navigation("Emprestimos");
                 });
 #pragma warning restore 612, 618
         }
